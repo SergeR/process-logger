@@ -20,6 +20,7 @@ class ProcessLogger extends AbstractLogger
 
     protected $messages;
     protected $start;
+    protected $mem;
     protected $timers = [];
 
     public function __construct($log_level = null)
@@ -84,6 +85,7 @@ class ProcessLogger extends AbstractLogger
 
         if (!$this->start) {
             $this->start = microtime(true);
+            $this->mem = memory_get_peak_usage();
         }
 
         if (!$this->messages) {
@@ -103,7 +105,11 @@ class ProcessLogger extends AbstractLogger
             return '';
         }
 
-        $this->messages[] = sprintf('* = Total execution time %0.2F seconds', microtime(true) - $this->start);
+        $this->messages[] = sprintf(
+            '* = Total execution time %0.2F seconds, total used memory: %s MBytes',
+            microtime(true) - $this->start,
+            rtrim(rtrim(number_format((memory_get_peak_usage() - $this->mem) / 1048576, 3, '', '.'), '.'), '0')
+        );
         $this->messages[] = '*********************************************';
         $result = implode("\n", $this->messages);
         $this->messages = $this->start = null;
