@@ -109,7 +109,7 @@ class ProcessLogger extends AbstractLogger
 
 
         $this->messages[] = sprintf(
-            '* = Total execution time %0.2F seconds, total used memory: %s MBytes',
+            '* = Total execution time %0.2F seconds, total used memory: %s',
             microtime(true) - $this->start,
             $this->formatBytes($bytes_used)
         );
