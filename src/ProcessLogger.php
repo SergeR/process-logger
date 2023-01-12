@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright     Copyright (c) 2018, Serge Rodovnichenko, <sergerod@gmail.com>
+ * @copyright     Copyright (c) 2018-2023, Serge Rodovnichenko, <sergerod@gmail.com>
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -13,15 +13,15 @@ class ProcessLogger extends AbstractLogger
 {
 
     /** @var string|null Current log level. If null, logging is disabled */
-    protected $level;
+    protected ?string $level = null;
 
     /** @var array Array of levels to log */
-    protected $levels_to_log = [];
+    protected array $levels_to_log = [];
 
-    protected $messages;
-    protected $start;
-    protected $mem;
-    protected $timers = [];
+    protected ?array $messages = null;
+    protected ?float $start = null;
+    protected int $mem = 0;
+    protected array $timers = [];
 
     public function __construct($log_level = null)
     {
@@ -33,7 +33,7 @@ class ProcessLogger extends AbstractLogger
      *
      * @return null|string
      */
-    public function getLogLevel()
+    public function getLogLevel(): ?string
     {
         return $this->level;
     }
@@ -44,7 +44,7 @@ class ProcessLogger extends AbstractLogger
      * @param string|null $log_level
      * @return $this
      */
-    public function setLogLevel($log_level)
+    public function setLogLevel(?string $log_level): ProcessLogger
     {
         // descending list of levels
         $all_levels = array(
@@ -99,14 +99,13 @@ class ProcessLogger extends AbstractLogger
      *
      * @return string
      */
-    public function flush()
+    public function flush(): string
     {
         if (empty($this->messages)) {
             return '';
         }
 
         $bytes_used = memory_get_peak_usage() - $this->mem;
-
 
         $this->messages[] = sprintf(
             '* = Total execution time %0.2F seconds, total used memory: %s',
@@ -127,7 +126,7 @@ class ProcessLogger extends AbstractLogger
      * @param array $context
      * @return string
      */
-    protected function interpolate($message, array $context = array())
+    protected function interpolate(string $message, array $context = array()): string
     {
         // build a replacement array with braces around the context keys
         $replace = array();
@@ -145,11 +144,11 @@ class ProcessLogger extends AbstractLogger
     }
 
     /**
-     * @param $bytes
+     * @param int $bytes
      * @param int $precision
      * @return string
      */
-    protected function formatBytes($bytes, $precision = 3)
+    protected function formatBytes(int $bytes, int $precision = 3): string
     {
         $units = array('B', 'KB', 'MB', 'GB', 'TB');
 
